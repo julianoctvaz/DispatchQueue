@@ -11,10 +11,7 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        doSomething()
-//        doEmojiThings()
-//        doAnotherThing()
-//        eachQueueIsIt()
+//        doSomething()
     }
 
 //    override func loadView() {
@@ -29,9 +26,12 @@ class ViewController: UIViewController {
 //        doSomething()
 //    }
     
-//    override func viewDidAppear(_ animated: Bool) {
-//        doSomething()
-//    }
+    override func viewDidAppear(_ animated: Bool) {
+        doSomething()
+        doEmojiThings()
+        doAnotherThing()
+        eachQueueIsIt()
+    }
         
     func doEmojiThings() {
         
@@ -50,6 +50,7 @@ class ViewController: UIViewController {
     
     func doSomething() {
         DispatchQueue.main.asyncAfter(deadline: .now()) {
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.0001) {
             print("A")
         }
 
@@ -77,7 +78,7 @@ class ViewController: UIViewController {
     
     func doAnotherThing() {
         
-        let queue = DispatchQueue(label: "queue")
+//        let queue = DispatchQueue(label: "queue")
         //queue é uma fila serial, e por padrão, filas criadas dessa maneira são executadas em uma thread de fundo (background thread), a menos que seja especificado o contrário, isto é, da forma cocmo está, a gente está sem especificar o parâmetro qos (Quality of Service) ou attributes
         
         let viewA = UIView()
@@ -87,14 +88,23 @@ class ViewController: UIViewController {
         
         let view = viewA
         
-        queue.async { [view] in
-            print(view.tag)
+//    Errado:
+//        queue.async { [view] in
+//            print(view.tag)
+            //aqui vai sair o errinho roxo: UIView.tag must be used from main thread only ☠️
+//        }
+//    Porque:
 //            Todas as operações que envolvem modificações ou leituras de UI precisam ocorrer na main thread
             //O erro Main Thread Checker: UI API called on a background thread) ocorre porque você está tentando acessar uma propriedade da interface do usuário (UIView.tag) a partir de uma thread de background, o que não é permitido em iOS.
             
             //Se você quisermos executar essa fila na thread principal, teríamos que usar explicitamente DispatchQueue.main, que é a fila dedicada às operações de interface de usuário.
             
             //Operações que não envolvem a UI (como cálculos ou operações de rede) são geralmente movidas para filas em threads de fundo para evitar bloqueios na thread principal.
+            
+//        Correto:
+//        queue.main.async // Static member 'main' cannot be used on instance of type 'DispatchQueue'
+          DispatchQueue.main.async { [view] in
+                print(view.tag)
         }
     }
 }
